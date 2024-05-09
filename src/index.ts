@@ -18,6 +18,6 @@ app.route("/stocks", StocksController);
 connect();
 
 export default {
-  port: 3001,
+  port: process.env.API_PORT,
   fetch: app.fetch,
 };

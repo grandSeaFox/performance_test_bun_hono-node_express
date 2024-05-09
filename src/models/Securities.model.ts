@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { CronSchema } from "./Cron.model";
 
 export const SecuritiesSchema = z.object({
   symbol: z.string(),
