@@ -1,15 +1,14 @@
-import { CronTicker } from "./cron";
+import { Document } from "mongodb";
 
-export type Securities = {
+export interface Securities extends Document {
   symbol: string;
-  name: string;
+  name?: string;
   exchange: string;
   assetType: string;
   ipoDate: Date;
-  delistingDate?: Date;
+  delistingDate?: Date | null;
   status?: string;
-  country?: string;
-  sector?: string;
-  industry?: string;
-  cronInfo: CronTicker;
-};
+  country?: string | null;
+  sector?: string | null;
+  industry?: string | null;
+}

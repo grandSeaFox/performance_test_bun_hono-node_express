@@ -1,33 +1,50 @@
-import connect from "../../config/dbClient";
+import { connect } from "../../config/dbClient";
 
 export const searchStocks = async ({ query }: { query: string }) => {
   const db = await connect();
-  const normalizedQuery = query.toUpperCase();
+
+  const regexPattern = new RegExp(query.split("").join(".*"), "i");
 
   const projection = {
     cronInfo: 0,
     _id: 0,
     __v: 0,
   };
-
-  let findQuery = {};
-  if (normalizedQuery.length === 1) {
-    findQuery = { symbol: normalizedQuery };
-  } else {
-    findQuery = { $text: { $search: normalizedQuery } };
-  }
-
   try {
-    return db
+    let results = await db
       .collection("securities")
-      .find(findQuery, { projection })
-      .sort(
-        normalizedQuery.length === 1 ? {} : { score: { $meta: "textScore" } }
+      .find(
+        {
+          $or: [
+            { symbol: { $regex: regexPattern } },
+            { name: { $regex: regexPattern } },
+          ],
+        },
+        {
+          projection,
+        }
       )
-      .limit(50)
       .toArray();
+
+    results = results
+      .map((result) => ({
+        ...result,
+        score: calculateScore(result, query),
+      }))
+      .sort((a, b) => b.score - a.score);
+
+    return results.slice(0, 10);
   } catch (error: any) {
     console.error("Error fetching stocks:", error);
     throw new Error(`Failed to fetch stocks: ${error.message}`);
   }
 };
+
+function calculateScore(item: any, query: string): number {
+  let score = 0;
+
+  if (item.symbol.toLowerCase() === query.toLowerCase()) score += 100;
+  if (item.name?.toLowerCase().includes(query.toLowerCase())) score += 50;
+
+  return score;
+}
