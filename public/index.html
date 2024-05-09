@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Stock Search</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Stock Search Test</h1>
+    <input
+      type="text"
+      id="searchQuery"
+      placeholder="symbol"
+      autocomplete="off"
+    />
+
+    <div id="results"></div>
+    <div id="queryInfo"></div>
+
+    <script>
+      const searchQuery = document.getElementById("searchQuery");
+      const resultsElement = document.getElementById("results");
+      const queryInfoElement = document.getElementById("queryInfo");
+
+      searchQuery.addEventListener("input", async function () {
+        if (searchQuery.value.length > 0) {
+          const startTime = performance.now();
+          const response = await fetch(
+            `/stocks/search?query=${encodeURIComponent(searchQuery.value)}`
+          );
+          const data = await response.json();
+          const endTime = performance.now();
+          const elapsedTime = (endTime - startTime).toFixed(2);
+
+          if (data && data.length > 0) {
+            resultsElement.innerHTML = `<ul>${data
+              .map((item) => `<li>${item.symbol} - ${item.name}</li>`)
+              .join("")}</ul>`;
+            queryInfoElement.innerHTML = `Query took: ${elapsedTime} ms - Results: ${data.length} items`;
+          } else {
+            resultsElement.innerHTML = "<p>No results found.</p>";
+            queryInfoElement.innerHTML = `Query took: ${elapsedTime} ms - No items found`;
+          }
+        } else {
+          resultsElement.innerHTML = "";
+          queryInfoElement.innerHTML = "";
+        }
+      });
+    </script>
+  </body>
+</html>
