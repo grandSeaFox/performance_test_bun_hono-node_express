@@ -1,11 +1,12 @@
 import { Hono } from "hono";
-import { logger } from "hono/logger";
 import { serveStatic } from "hono/bun";
 import StocksController from "./controllers/PostgresController/securities.controller";
+import { customLogger } from "./middlewares/customLogger";
+/* import transferData from "./utils"; */
 
 const app = new Hono();
 
-app.use(logger());
+app.use(customLogger);
 app.use("/public", serveStatic({ root: "../public" }));
 
 app.get("/", async (c) => {
@@ -13,6 +14,8 @@ app.get("/", async (c) => {
   return c.html(htmlContent);
 });
 app.route("/stocks", StocksController);
+
+/* transferData(); */
 
 export default {
   port: process.env.API_PORT,

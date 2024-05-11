@@ -1,4 +1,3 @@
-// src/shared/services/StocksService.ts
 import { Securities, SecuritiesSchema } from "../../models/securities.model";
 import { searchStocks } from "./search";
 

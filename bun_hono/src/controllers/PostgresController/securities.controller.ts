@@ -6,6 +6,7 @@ const StocksController = new Hono();
 
 StocksController.get("/search", async (c) => {
   const query = c.req.query("query");
+  const cache = !!c.req.query("cache");
 
   if (typeof query !== "string") {
     return c.json({ error: "Query should be a string" }, 400);
@@ -17,7 +18,8 @@ StocksController.get("/search", async (c) => {
 
   try {
     const securities = await securitiesService.findSecuritiesByFuzzyQuery(
-      query
+      query,
+      cache
     );
 
     if (!securities || securities.length === 0) {
@@ -30,7 +32,38 @@ StocksController.get("/search", async (c) => {
     return c.json(securities);
   } catch (error: any) {
     console.error("Error searching for stocks:", error);
-    return c.json({ error: error.message }, 500);
+    return c.json({ error: error.message.message }, 500);
+  }
+});
+
+StocksController.get("/cache", async (c) => {
+  try {
+    const cacheItems = await securitiesService.showCache();
+
+    if (!cacheItems || cacheItems.length === 0) {
+      return c.json({ message: "No cacheItems available to show." }, 204);
+    }
+
+    return c.json(cacheItems);
+  } catch (error: any) {
+    console.error("Error searching for cacheItems:", error);
+    return c.json({ error: error.message.message }, 500);
+  }
+});
+
+StocksController.delete("/cache", async (c) => {
+  try {
+    await securitiesService.deleteCache();
+    const cacheItems = await securitiesService.showCache();
+
+    if (!cacheItems || cacheItems.length === 0) {
+      return c.json({ message: "Deleted cached items" }, 200);
+    }
+
+    return c.json(cacheItems);
+  } catch (error: any) {
+    console.error("Error searching for cacheItems:", error);
+    return c.json({ error: error.message.message }, 500);
   }
 });
 

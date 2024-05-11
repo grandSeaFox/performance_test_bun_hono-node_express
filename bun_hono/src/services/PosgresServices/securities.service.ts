@@ -1,4 +1,6 @@
 import { SecuritiesRepository } from "../../repositories/securities.repository";
+import type { CacheItem } from "../../types/cacheItem";
+import type { Securities } from "../../types/securities";
 
 export class SecuritiesService {
   private repository: SecuritiesRepository;
@@ -7,11 +9,18 @@ export class SecuritiesService {
     this.repository = new SecuritiesRepository();
   }
 
-  async getAllSecurities(): Promise<any[]> {
-    return this.repository.findAll();
+  async findSecuritiesByFuzzyQuery(
+    fuzzyQuery: string,
+    cache?: boolean
+  ): Promise<Securities[]> {
+    return this.repository.searchByTsQuery(fuzzyQuery, cache);
   }
 
-  async findSecuritiesByFuzzyQuery(fuzzyQuery: string): Promise<any[]> {
-    return this.repository.searchByTsQuery(fuzzyQuery);
+  async showCache(): Promise<CacheItem[]> {
+    return this.repository.showAllCache();
+  }
+
+  async deleteCache(): Promise<void> {
+    this.repository.deleteAllCache();
   }
 }

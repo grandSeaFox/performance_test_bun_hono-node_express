@@ -1,6 +1,6 @@
 CREATE TABLE securities (
     id SERIAL PRIMARY KEY,
-    symbol VARCHAR(255) NOT NULL,
+    symbol VARCHAR(255) UNIQUE NOT NULL,
     name VARCHAR(255),
     exchange VARCHAR(255) NOT NULL,
     asset_type VARCHAR(255) NOT NULL,
@@ -17,12 +17,12 @@ CREATE TABLE securities (
 CREATE OR REPLACE FUNCTION securities_tsvector_update() RETURNS trigger AS $$
 BEGIN
     NEW.document_tsvector :=
-        setweight(to_tsvector('english', coalesce(NEW.symbol, '')), 'A') ||
-        setweight(to_tsvector('english', coalesce(NEW.name, '')), 'B');
+        setweight(to_tsvector(coalesce(NEW.symbol, '')), 'A') ||
+        setweight(to_tsvector(coalesce(NEW.name, '')), 'C');
     RETURN NEW;
 END
 $$ LANGUAGE plpgsql;
 
 -- Update the tsvector column anytime the 'name' or 'symbol' fields are changed
 CREATE TRIGGER securities_tsvector_update BEFORE INSERT OR UPDATE
-ON securities FOR EACH ROW EXECUTE FUNCTION securities_tsvector_upoudate();
+ON securities FOR EACH ROW EXECUTE FUNCTION securities_tsvector_update();

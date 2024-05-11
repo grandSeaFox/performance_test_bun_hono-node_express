@@ -1,4 +1,3 @@
-// External Dependencies
 import { Hono } from "hono";
 import stocksService from "../../services/MongoServices/stocks.service";
 

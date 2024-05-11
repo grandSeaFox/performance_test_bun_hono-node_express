@@ -6,50 +6,188 @@
     <style>
       body {
         font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: space-between;
+      }
+      #cache,
+      #searchArea {
+        flex: 1;
+        padding: 20px;
+      }
+      #cache {
+        border-left: 2px solid #ccc;
+        margin-left: 20px;
+        padding-left: 20px;
+      }
+      .card {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 8px;
+      }
+      ul {
+        list-style-type: none;
+        padding: 0;
+      }
+      .card ul {
+        padding: 0;
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0;
+      }
+      .card li {
+        flex: 1 1 50%;
+        margin-bottom: 5px;
+        list-style-type: none;
       }
     </style>
   </head>
   <body>
-    <h1>Stock Search Test</h1>
-    <input
-      type="text"
-      id="searchQuery"
-      placeholder="symbol"
-      autocomplete="off"
-    />
-
-    <div id="results"></div>
-    <div id="queryInfo"></div>
+    <div id="searchArea">
+      <div
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        "
+      >
+        <h1>Stock Search Test</h1>
+        <label>
+          <input type="checkbox" id="useCacheToggle" checked />
+          Use Cache
+        </label>
+      </div>
+      <div
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        "
+      >
+        <input
+          type="text"
+          id="searchQuery"
+          placeholder="Enter symbol"
+          autocomplete="off"
+        />
+        <div id="queryInfo"></div>
+      </div>
+      <div id="results"></div>
+    </div>
+    <div id="cache">
+      <h2>Cached Items</h2>
+      <button onclick="clearCache()">Clear Cache</button>
+      <div id="cachedResults"></div>
+    </div>
 
     <script>
       const searchQuery = document.getElementById("searchQuery");
       const resultsElement = document.getElementById("results");
       const queryInfoElement = document.getElementById("queryInfo");
+      const cachedResultsElement = document.getElementById("cachedResults");
+      const useCacheToggle = document.getElementById("useCacheToggle");
 
+      // Function to fetch and display cached items
+      async function fetchCachedItems() {
+        const response = await fetch("/stocks/cache");
+        const cachedItems = await response.json();
+        cachedResultsElement.innerHTML = cachedItems
+          .map(
+            (item) =>
+              `<div>
+                            <strong>Search Q:</strong> ${item.key}
+                            <br>  <strong>Item count:</strong> ${
+                              item.value.length
+                            }
+                            <br>Expires: ${new Date(
+                              item.expire
+                            ).toLocaleString()}
+                        </div>`
+          )
+          .join("<hr>");
+      }
+
+      // Event listener for search input
       searchQuery.addEventListener("input", async function () {
         if (searchQuery.value.length > 0) {
           const startTime = performance.now();
+          const cacheParam = useCacheToggle.checked ? "true" : "";
           const response = await fetch(
-            `/stocks/search?query=${encodeURIComponent(searchQuery.value)}`
+            `/stocks/search?query=${encodeURIComponent(
+              searchQuery.value
+            )}&cache=${cacheParam}`
           );
+          fetchCachedItems();
           const data = await response.json();
           const endTime = performance.now();
           const elapsedTime = (endTime - startTime).toFixed(2);
 
+          if (!data) resultsElement.innerHTML = [];
           if (data && data.length > 0) {
-            resultsElement.innerHTML = `<ul>${data
-              .map((item) => `<li>${item.symbol} - ${item.name}</li>`)
-              .join("")}</ul>`;
-            queryInfoElement.innerHTML = `Query took: ${elapsedTime} ms - Results: ${data.length} items`;
+            resultsElement.innerHTML = data
+              .map(
+                (stock) =>
+                  `<div class="card">
+                                    <ul>
+                                        <li><strong>Symbol:</strong> ${
+                                          stock.symbol
+                                        }</li>
+                                        <li><strong>Name:</strong> ${
+                                          stock.name || "N/A"
+                                        }</li>
+                                        <li><strong>Exchange:</strong> ${
+                                          stock.exchange
+                                        }</li>
+                                        <li><strong>Asset Type:</strong> ${
+                                          stock.asset_type
+                                        }</li>
+                                        <li><strong>IPO Date:</strong> ${new Date(
+                                          stock.ipo_date
+                                        ).toLocaleDateString()}</li>
+                                        <li><strong>Delisting Date:</strong> ${
+                                          stock.delisting_date
+                                            ? new Date(
+                                                stock.delisting_date
+                                              ).toLocaleDateString()
+                                            : "N/A"
+                                        }</li>
+                                        <li><strong>Status:</strong> ${
+                                          stock.status || "N/A"
+                                        }</li>
+                                        <li><strong>Country:</strong> ${
+                                          stock.country || "N/A"
+                                        }</li>
+                                        <li><strong>Sector:</strong> ${
+                                          stock.sector || "N/A"
+                                        }</li>
+                                        <li><strong>Industry:</strong> ${
+                                          stock.industry || "N/A"
+                                        }</li>
+                                    </ul>
+                                </div>`
+              )
+              .join("");
+            queryInfoElement.innerHTML = `<strong>Query took:</strong> ${elapsedTime} ms - <strong>Results:</strong> ${data.length} items`;
           } else {
             resultsElement.innerHTML = "<p>No results found.</p>";
             queryInfoElement.innerHTML = `Query took: ${elapsedTime} ms - No items found`;
           }
+
+          // Update the cache display whenever a search is made
         } else {
           resultsElement.innerHTML = "";
           queryInfoElement.innerHTML = "";
         }
       });
+
+      // Function to clear the cache
+      async function clearCache() {
+        await fetch("/stocks/cache", { method: "DELETE" });
+        cachedResultsElement.innerHTML = "<p>Cache cleared!</p>";
+      }
+
+      // Initial fetch of cache on page load
+      fetchCachedItems();
     </script>
   </body>
 </html>
