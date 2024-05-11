@@ -1,22 +1,26 @@
-// External Dependencies
 import { Hono } from "hono";
-import stocksService from "../services/stocks.service";
+import { SecuritiesService } from "../../services/PosgresServices/securities.service";
 
+const securitiesService = new SecuritiesService();
 const StocksController = new Hono();
 
 StocksController.get("/search", async (c) => {
   const query = c.req.query("query");
+
   if (typeof query !== "string") {
     return c.json({ error: "Query should be a string" }, 400);
   }
+
   if (!query) {
     return c.json({ error: "Please provide a search query." }, 400);
   }
 
   try {
-    const securities = await stocksService.searchStockByQuery(query);
+    const securities = await securitiesService.findSecuritiesByFuzzyQuery(
+      query
+    );
 
-    if (!securities || Object.keys(securities).length === 0) {
+    if (!securities || securities.length === 0) {
       return c.json(
         { message: "No securities available for the provided symbol." },
         204

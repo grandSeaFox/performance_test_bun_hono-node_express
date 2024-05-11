@@ -1,8 +1,7 @@
 import { Hono } from "hono";
 import { logger } from "hono/logger";
 import { serveStatic } from "hono/bun";
-import StocksController from "./controllers/stocks.controller";
-import connect from "./config/dbClient";
+import StocksController from "./controllers/PostgresController/securities.controller";
 
 const app = new Hono();
 
@@ -14,8 +13,6 @@ app.get("/", async (c) => {
   return c.html(htmlContent);
 });
 app.route("/stocks", StocksController);
-
-connect();
 
 export default {
   port: process.env.API_PORT,

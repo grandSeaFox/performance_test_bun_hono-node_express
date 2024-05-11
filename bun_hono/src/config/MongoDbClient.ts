@@ -8,11 +8,11 @@ const options = {
 };
 
 const uri = process.env.MONGO_URI!;
-const client = new MongoClient(uri, options);
+const client = new MongoClient(uri);
 
 let dbInstance: MongoClient | null = null;
 
-export const connect = async () => {
+const mongodb = async () => {
   if (dbInstance) {
     return dbInstance.db(process.env.MONGO_DB_NAME);
   }
@@ -26,9 +26,9 @@ export const connect = async () => {
       "MongoDB connection unsuccessful, retry after 5 seconds.",
       err
     );
-    setTimeout(connect, 5000);
+    setTimeout(mongodb, 5000);
     throw err;
   }
 };
 
-export default connect;
+export default mongodb();

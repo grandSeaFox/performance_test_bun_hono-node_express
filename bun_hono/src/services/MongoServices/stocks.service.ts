@@ -1,11 +1,9 @@
 // src/shared/services/StocksService.ts
-import { Securities, SecuritiesSchema } from "../models/Securities.model";
-import { searchStocks } from "./domain";
+import { Securities, SecuritiesSchema } from "../../models/securities.model";
+import { searchStocks } from "./search";
 
 class StocksService {
-  async searchStockByQuery(
-    query: string,
-  ): Promise<Array<Securities>> {
+  async searchStockByQuery(query: string): Promise<Array<Securities>> {
     try {
       const stocks = await searchStocks({ query });
       return stocks.map((stock) => SecuritiesSchema.parse(stock));

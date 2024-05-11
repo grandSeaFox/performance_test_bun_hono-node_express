@@ -1,7 +1,7 @@
-import { connect } from "../../config/dbClient";
+import mongodb from "../../config/MongoDbClient";
 
 export const searchStocks = async ({ query }: { query: string }) => {
-  const db = await connect();
+  const db = await mongodb;
 
   const regexPattern = new RegExp(query.split("").join(".*"), "i");
 
@@ -44,7 +44,7 @@ function calculateScore(item: any, query: string): number {
   let score = 0;
 
   if (item.symbol.toLowerCase() === query.toLowerCase()) score += 100;
-  if (item.name?.toLowerCase().includes(query.toLowerCase())) score += 50;
+  if (item.name?.toLowerCase().includes(query.toLowerCase())) score += 10;
 
   return score;
 }
