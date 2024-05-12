@@ -89,7 +89,7 @@
 
       // Function to fetch and display cached items
       async function fetchCachedItems() {
-        const response = await fetch("/stocks/cache");
+        const response = await fetch("/api/cache");
         const cachedItems = await response.json();
         cachedResultsElement.innerHTML = cachedItems
           .map(
@@ -113,7 +113,7 @@
           const startTime = performance.now();
           const cacheParam = useCacheToggle.checked ? "true" : "";
           const response = await fetch(
-            `/stocks/search?query=${encodeURIComponent(
+            `/api/search?query=${encodeURIComponent(
               searchQuery.value
             )}&cache=${cacheParam}`
           );
@@ -182,7 +182,7 @@
 
       // Function to clear the cache
       async function clearCache() {
-        await fetch("/stocks/cache", { method: "DELETE" });
+        await fetch("/api/cache", { method: "DELETE" });
         cachedResultsElement.innerHTML = "<p>Cache cleared!</p>";
       }
 

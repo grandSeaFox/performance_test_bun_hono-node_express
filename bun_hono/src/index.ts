@@ -13,7 +13,7 @@ app.get("/", async (c) => {
   const htmlContent = await Bun.file("./public/index.html").text();
   return c.html(htmlContent);
 });
-app.route("/stocks", StocksController);
+app.route("/api", StocksController);
 
 /* transferData(); */
 

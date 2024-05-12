@@ -33,6 +33,24 @@ services:
       PGPORT: 5432
       MONGO_URI: mongodb://host.docker.internal:26115
       MONGO_DB_NAME: local
+      API_PORT: 3001
+    mem_limit: 1g
+    cpus: 1
+
+  node_express_app:
+    build: ./node+express
+    ports:
+      - "3002:3002"
+    depends_on:
+      - postgres
+    environment:
+      NODE_ENV: development
+      PGHOST: postgres
+      PGDATABASE: docker
+      PGUSER: docker
+      PGPASSWORD: docker
+      PGPORT: 5432
+      API_PORT: 3002
     mem_limit: 1g
     cpus: 1
 
