@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { SecuritiesService } from "../../services/PosgresServices/securities.service";
+import { SecuritiesService } from "../services/securities.service";
 
 const securitiesService = new SecuritiesService();
 const StocksController = new Hono();

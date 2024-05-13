@@ -1,5 +1,5 @@
 import express from "express";
-import StocksController from "./controllers/PostgresController/securities.controller";
+import StocksController from "./controllers/securities.controller";
 
 const app = express();
 

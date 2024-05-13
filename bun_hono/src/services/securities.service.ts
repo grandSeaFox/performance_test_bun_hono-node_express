@@ -1,6 +1,6 @@
-import { SecuritiesRepository } from "../../repositories/securities.repository";
-import type { CacheItem } from "../../types/cacheItem";
-import type { Securities } from "../../types/securities";
+import { SecuritiesRepository } from "../repositories/securities.repository";
+import type { CacheItem } from "../types/cacheItem";
+import type { Securities } from "../types/securities";
 
 export class SecuritiesService {
   private repository: SecuritiesRepository;

@@ -1,0 +1,17 @@
+config:
+  target: "http://localhost:3002"
+  phases:
+    - duration: 3600
+      arrivalRate: 110
+      name: "Warmup 110 concurrent users"
+  processor: "./artillery_func.js"
+
+scenarios:
+  - name: "Search API test"
+    flow:
+      - function: "randomQuery"
+      - get:
+          url: "/api/search?query={{ query }}"
+          capture:
+            json: "$"
+            as: "response_data"

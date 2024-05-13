@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
-import StocksController from "./controllers/PostgresController/securities.controller";
+import StocksController from "./controllers/securities.controller";
 import { customLogger } from "./middlewares/customLogger";
 /* import transferData from "./utils"; */
 
