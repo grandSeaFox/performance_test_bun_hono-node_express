@@ -1,6 +1,4 @@
-import { Document } from "mongodb";
-
-export interface Securities extends Document {
+export interface Securities {
   symbol: string;
   name?: string;
   exchange: string;

@@ -7,22 +7,6 @@ class Cache {
   private cache = new Map<string, CacheItem>();
   private ttl: number = 1000 * 60 * 15;
 
-  getAll(): CacheItem[] {
-    const allItems: CacheItem[] = [];
-    const now = Date.now();
-    for (const [key, item] of this.cache.entries()) {
-      if (item.expire > now) {
-        allItems.push({
-          key: item.key,
-          value: item.value,
-          expire: item.expire,
-        });
-      } else {
-        this.cache.delete(key);
-      }
-    }
-    return allItems;
-  }
   get(key: string): Securities[] | undefined {
     const item = this.cache.get(key);
     if (item && item.expire > Date.now()) {
@@ -37,21 +21,10 @@ class Cache {
     this.cache.set(key, { key, value, expire });
   }
 
-  deleteAll(): void {
-    this.cache.clear();
-  }
 }
 
 export class SecuritiesRepository {
   private cache = new Cache();
-
-  async showAllCache(): Promise<CacheItem[]> {
-    return this.cache.getAll();
-  }
-
-  async deleteAllCache(): Promise<void> {
-    this.cache.deleteAll();
-  }
 
   async searchByTsQuery(
     inputQuery: string,
