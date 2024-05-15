@@ -2,8 +2,8 @@ config:
   target: "http://localhost:3002"
   phases:
     - duration: 3600
-      arrivalRate: 110
-      name: "Warmup 110 concurrent users"
+      arrivalRate: 115
+      name: "Warmup 115 concurrent users"
   processor: "./artillery_func.js"
 
 scenarios:

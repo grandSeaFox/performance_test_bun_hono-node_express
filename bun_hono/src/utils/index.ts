@@ -17,19 +17,14 @@ async function transferData() {
 
       const insertQuery = sql`
         INSERT INTO securities
-        (symbol, name, exchange, asset_type, ipo_date, delisting_date, status, country, sector, industry, document_tsvector)
+        (symbol, name, exchange, asset_type, ipo_date, delisting_date, status, country, sector, industry)
         VALUES 
         (${doc.symbol}, ${doc.name || doc.symbol}, ${doc.exchange}, ${
         doc.assetType
       }, ${doc.ipoDate}, ${doc.delistingDate}, ${doc.status}, ${doc.country}, ${
         doc.sector
-      }, ${doc.industry},
-         setweight(to_tsvector('english', coalesce(${doc.symbol}, '')), 'A') ||
-         setweight(to_tsvector('english', coalesce(${
-           doc.name || doc.symbol
-         }, '')), 'B')
-        )
-        ON CONFLICT (symbol) DO NOTHING
+      }, ${doc.industry}
+        ) ON CONFLICT (symbol) DO NOTHING
       `;
 
       // Execute the query

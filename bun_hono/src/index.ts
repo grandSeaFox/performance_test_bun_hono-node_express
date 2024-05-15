@@ -6,7 +6,7 @@ import { customLogger } from "./middlewares/customLogger";
 
 const app = new Hono();
 
-app.use(customLogger);
+/* app.use(customLogger); */
 app.use("/public", serveStatic({ root: "../public" }));
 
 app.get("/", async (c) => {

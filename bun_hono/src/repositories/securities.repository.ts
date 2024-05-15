@@ -70,7 +70,6 @@ export class SecuritiesRepository {
     const cacheKey = inputQuery;
     const cachedResult = this.cache.get(inputQuery);
     if (cache && cachedResult) {
-      console.log("Returning cached results");
       return cachedResult;
     }
 
@@ -85,9 +84,9 @@ export class SecuritiesRepository {
 
     try {
       const result = await sql<Securities[]>`
-      SELECT *, ts_rank_cd(document_tsvector, websearch_to_tsquery(${formattedQuery})) as rank
+      SELECT *, ts_rank_cd(tsv, websearch_to_tsquery(${formattedQuery})) as rank
       FROM securities
-      WHERE document_tsvector @@ websearch_to_tsquery(${formattedQuery})
+      WHERE tsv @@ websearch_to_tsquery(${formattedQuery})
       ORDER BY rank DESC
       LIMIT 30
   `;

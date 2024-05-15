@@ -1,3 +1,8 @@
+CREATE OR REPLACE FUNCTION immutable_to_tsvector(varchar) RETURNS tsvector
+IMMUTABLE LANGUAGE SQL AS $$
+SELECT to_tsvector('english', $1);
+$$;
+
 CREATE TABLE securities (
     id SERIAL PRIMARY KEY,
     symbol VARCHAR(255) UNIQUE NOT NULL,
@@ -10,19 +15,10 @@ CREATE TABLE securities (
     country VARCHAR(255),
     sector VARCHAR(255),
     industry VARCHAR(255),
-    document_tsvector TSVECTOR
+    tsv TSVECTOR GENERATED ALWAYS AS (
+        setweight(immutable_to_tsvector(coalesce(symbol, '')), 'A') ||
+        setweight(immutable_to_tsvector(coalesce(name, '')), 'C')
+    ) STORED
 );
 
--- Create an index for the tsvector column
-CREATE OR REPLACE FUNCTION securities_tsvector_update() RETURNS trigger AS $$
-BEGIN
-    NEW.document_tsvector :=
-        setweight(to_tsvector(coalesce(NEW.symbol, '')), 'A') ||
-        setweight(to_tsvector(coalesce(NEW.name, '')), 'C');
-    RETURN NEW;
-END
-$$ LANGUAGE plpgsql;
-
--- Update the tsvector column anytime the 'name' or 'symbol' fields are changed
-CREATE TRIGGER securities_tsvector_update BEFORE INSERT OR UPDATE
-ON securities FOR EACH ROW EXECUTE FUNCTION securities_tsvector_update();
+CREATE INDEX idx_securities_tsv ON securities USING gin (tsv);

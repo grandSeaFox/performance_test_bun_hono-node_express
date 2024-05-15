@@ -16,12 +16,9 @@ module.exports = {
       "MO",
       "MCD",
     ];
-    const cacheOpts = ["true", "false"];
     const randomIndex = Math.floor(Math.random() * queries.length);
-    const randomCacheIndex = Math.floor(Math.random() * cacheOpts.length);
 
     context.vars.query = queries[randomIndex];
-    context.vars.cache = cacheOpts[randomCacheIndex];
 
     done();
   },
